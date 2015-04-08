@@ -1,4 +1,6 @@
 class User < ActiveRecord::Base
+  has_many :microposts, dependent: :destroy
+  
   attr_accessor :remember_token, :activation_token, :reset_token
   before_save :downcase_email
   before_create :create_activation_digest
@@ -9,6 +11,7 @@ class User < ActiveRecord::Base
                     uniqueness: { case_sensitive: false }
    has_secure_password
    validates :password, length: { minimum: 6 },allow_blank:true
+
 
    # Returns the hash digest of the given string.
   def User.digest(string)
@@ -33,6 +36,10 @@ class User < ActiveRecord::Base
     digest=send("#{attribute}_digest")
   	return false if digest.nil?
     BCrypt::Password.new(digest).is_password?(token)
+  end
+
+  def feed
+    microposts
   end
 
   # Forgets a user.
